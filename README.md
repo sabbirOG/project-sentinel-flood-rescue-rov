@@ -58,10 +58,49 @@ This separation ensures reliable low-level control while supporting computationa
 ---
 
 ## Repository Structure
-```text
+
 project-sentinel-flood-rescue-rov/
 │
 ├── esp32/                 # ESP32 motor control and sensor code
 ├── raspberry-pi/          # Camera, AI detection, and processing code
 ├── docs/                  # Block diagrams, figures, and report materials
 ├── README.md              # Project overview and documentation
+
+## How the System Works
+1. The operator remotely controls the boat using a laptop or mobile device.  
+2. The onboard camera streams live video from the boat to the operator.  
+3. The Raspberry Pi processes video frames in real time to detect humans.  
+4. When a human is detected:
+   - An alert is generated  
+   - GPS coordinates are collected  
+   - Location data is transmitted to the operator  
+5. Ultrasonic sensors continuously monitor obstacles and assist safe navigation.
+
+---
+
+## Testing and Validation
+The prototype was tested in a **controlled water environment**, where it:
+- Successfully floated and maneuvered on water  
+- Streamed live video reliably  
+- Detected human presence in real time  
+- Reported GPS coordinates upon detection  
+- Responded correctly to remote control commands  
+
+---
+
+## Project Status
+- ✔ Prototype implemented  
+- ✔ Hardware tested on water  
+- ✔ Human detection validated  
+- ✔ Results documented in project report  
+
+---
+
+## Authors
+This project was developed as part of an academic project by students of the  
+**Department of Computer Science and Engineering, United International University, Dhaka, Bangladesh**.
+
+---
+
+## License
+This project is intended for **academic and research purposes**.
