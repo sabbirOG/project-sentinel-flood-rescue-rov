@@ -1,0 +1,81 @@
+#include <WiFi.h>
+
+const char* ssid = "ESP32_MOTOR";
+const char* password = "12345678";
+
+WiFiServer server(80);
+
+// Motor A
+#define ENA 25
+#define IN1 26
+#define IN2 27
+
+// Motor B
+#define ENB 33
+#define IN3 14
+#define IN4 12
+
+void setup() {
+  pinMode(ENA, OUTPUT);
+  pinMode(ENB, OUTPUT);
+
+  pinMode(IN1, OUTPUT);
+  pinMode(IN2, OUTPUT);
+  pinMode(IN3, OUTPUT);
+  pinMode(IN4, OUTPUT);
+
+  // Set motor speed (0–255)
+  analogWrite(ENA, 200);
+  analogWrite(ENB, 200);
+
+  WiFi.softAP(ssid, password);
+  server.begin();
+}
+
+void loop() {
+  WiFiClient client = server.available();
+  if (!client) return;
+
+  String request = client.readStringUntil('\r');
+
+  if (request.indexOf("/F") != -1) forward();
+  if (request.indexOf("/B") != -1) backward();
+  if (request.indexOf("/S") != -1) stopMotor();
+
+  client.println("HTTP/1.1 200 OK");
+  client.println("Content-Type: text/html");
+  client.println();
+  client.println("<html><body>");
+  client.println("<h2>ESP32 Motor Control</h2>");
+  client.println("<a href=\"/F\"><button style='width:100px;height:50px'>FORWARD</button></a><br><br>");
+  client.println("<a href=\"/B\"><button style='width:100px;height:50px'>BACKWARD</button></a><br><br>");
+  client.println("<a href=\"/S\"><button style='width:100px;height:50px'>STOP</button></a>");
+  client.println("</body></html>");
+  client.stop();
+}
+
+// ===== MOTOR FUNCTIONS =====
+
+void forward() {
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
+
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, LOW);
+}
+
+void backward() {
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, HIGH);
+
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, HIGH);
+}
+
+void stopMotor() {
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, LOW);
+
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, LOW);
+}
