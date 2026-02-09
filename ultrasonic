@@ -1,0 +1,76 @@
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+#include <NewPing.h>
+
+// --- Configuration ---
+#define SCREEN_WIDTH    128
+#define SCREEN_HEIGHT   64
+#define OLED_ADDRESS    0x3C
+#define OLED_RESET      -1
+
+#define TRIG_PIN        5
+#define ECHO_PIN        18
+#define MAX_DISTANCE    400 // cm
+
+// --- Objects ---
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+NewPing sonar(TRIG_PIN, ECHO_PIN, MAX_DISTANCE);
+
+void setup() {
+  Serial.begin(115200);
+  
+  // Custom I2C pins for ESP32: SDA=21, SCL=22
+  Wire.begin(21, 22);
+
+  if (!display.begin(SSD1306_SWITCHCAPVCC, OLED_ADDRESS)) {
+    Serial.println(F("SSD1306 allocation failed"));
+    for (;;); // Don't proceed, loop forever
+  }
+
+  showBootMessage();
+}
+
+void loop() {
+  // NewPing recommends at least 29ms between pings
+  delay(50); 
+  
+  updateDisplay(sonar.ping_cm());
+}
+
+// --- Helper Functions ---
+
+void showBootMessage() {
+  display.clearDisplay();
+  display.setTextSize(1);
+  display.setTextColor(SSD1306_WHITE);
+  display.setCursor(20, 25);
+  display.println(F("SYSTEM READY"));
+  display.display();
+  delay(1500);
+}
+
+void updateDisplay(int distance) {
+  display.clearDisplay();
+  
+  // Header
+  display.setTextSize(1);
+  display.setCursor(0, 0);
+  display.println(F("Distance Sensor"));
+  display.drawFastHLine(0, 10, 128, SSD1306_WHITE);
+
+  // Value Logic
+  display.setCursor(0, 30);
+  if (distance == 0 || distance >= MAX_DISTANCE) {
+    display.setTextSize(2);
+    display.println(F("OUT OF RANGE"));
+  } else {
+    display.setTextSize(3);
+    display.print(distance);
+    display.setTextSize(1);
+    display.print(F(" cm"));
+  }
+
+  display.display();
+}
+eita ultrasonic distance and led display code
